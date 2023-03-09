@@ -4,42 +4,100 @@
 #include <stdbool.h>
 
 #define BUFFER_SIZE 256
+
+//create a process and put it on
+//the appropriate ready Q.
 int Create(int priority){
     printf("The create function\n");
 }
+
+//Copy the currently running
+//process and put it on the ready
+//Q corresponding to the
+//original process' priority.
+//Attempting to Fork the "init"
+//process (see below) should
+//fail. 
 int Fork(int priority){
     printf("The fork function\n");
 }
+
+//kill the named process and
+//remove it from the system.
 int Kill(int priority){
     printf("The kill function\n");
 }
+
+//kill the currently running
+//process.
 int Exit(int priority){
     printf("The exit function\n");
 }
+
+//time quantum of running
+//process expires.
 int Quantum(int priority){
     printf("The quantum function\n");
 }
+
+//send a message to another
+//process - block until reply
 int Send(int priority){
     printf("The send function\n");
 }
+
+//receive a message - block until
+//one arrives
 int Receive(int priority){
     printf("The receive function\n");
 }
+
+//unblocks sender and delivers
+//reply
 int Reply(int priority){
     printf("The reply function\n");
 }
+
+//Initialize the named
+//semaphore with the value
+//given. ID's can take a value
+//from 0 to 4. This can only be
+//done once for a semaphore -
+//subsequent attempts result in
+//error.
 int New_semaphore(int priority){
     printf("The new_semaphore function\n");
 }
+
+//execute the semaphore P
+//operation on behalf of the
+//running process. You can
+//assume sempahores IDs
+//numbered 0 through 4.
 int P_semaphore(int priority){
     printf("The p_semaphore function\n");
 }
+
+//execute the semaphore V
+//operation on behalf of the
+//running process. You can
+//assume sempahores IDs
+//numbered 0 through 4.
 int V_semaphore(int priority){
     printf("The v_semaphore function\n");
 }
+
+//dump complete state
+//information of process to
+//screen (this includes process
+//status and anything else you
+//can think of)
 int Process_info(int priority){
     printf("The process_info function\n");
 }
+
+//display all process queues and
+//their contents
 int Total_info(int priority){
     printf("The total_info function\n");
 }
