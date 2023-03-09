@@ -4,12 +4,16 @@
 #include <stdbool.h>
 #include <time.h>
 #include <pthread.h>
+#include "list.c"
 
 #define BUFFER_SIZE 256
 time_t start_time, current_time;
 int elapsed_time = 0;
 char buffer;
 
+
+//keeps track of the time in the program
+//used in the round robin scheduling and the time quantum
 void * clock_func(){
 
     start_time = time(NULL);
@@ -147,6 +151,11 @@ typedef struct semaphore{
 };
 
 int main (){
+    
+    //the three priority queues
+    List * p0_list = List_create();
+    List * p1_list = List_create();
+    List * p2_list = List_create();
 
     //starting the clock for use in timing the processes
     pthread_t tid;
