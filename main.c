@@ -8,16 +8,13 @@
 #define BUFFER_SIZE 256
 time_t start_time, current_time;
 int elapsed_time = 0;
+char buffer;
 
 void * clock_func(){
 
-
-    printf("Press Enter to start the stopwatch.\n");
-    getchar();
-
     start_time = time(NULL);
 
-    while (1) {
+    while (buffer != '!') {
         printf("Elapsed time: %d seconds\n", elapsed_time);
         current_time = time(NULL);
         elapsed_time = (int) difftime(current_time, start_time);
@@ -155,9 +152,6 @@ int main (){
         printf("Failed to create thread.\n");
         return 1;
     }
-
-    //storage for getchar
-    char buffer;
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
