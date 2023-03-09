@@ -193,4 +193,5 @@ int main (){
             printf("Command not recognised. Enter 'H' for help or '!' to close the program \n");
             continue;
         }
+    }
 }
