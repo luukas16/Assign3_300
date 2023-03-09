@@ -9,7 +9,7 @@
 time_t start_time, current_time;
 int elapsed_time = 0;
 
-void * clock(){
+void * clock_func(){
 
 
     printf("Press Enter to start the stopwatch.\n");
@@ -151,7 +151,7 @@ int main (){
 
     //starting the clock for use in timing the processes
     pthread_t tid;
-    if (pthread_create(&tid, NULL, &clock, NULL) != 0) {
+    if (pthread_create(&tid, NULL, &clock_func, NULL) != 0) {
         printf("Failed to create thread.\n");
         return 1;
     }
