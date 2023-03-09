@@ -2,8 +2,31 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <time.h>
+#include <pthread.h>
 
 #define BUFFER_SIZE 256
+time_t start_time, current_time;
+int elapsed_time = 0;
+
+void * clock(){
+
+
+    printf("Press Enter to start the stopwatch.\n");
+    getchar();
+
+    start_time = time(NULL);
+
+    while (1) {
+        printf("Elapsed time: %d seconds\n", elapsed_time);
+        current_time = time(NULL);
+        elapsed_time = (int) difftime(current_time, start_time);
+        sleep(1);
+        system("clear");
+    }
+
+    return NULL;
+}
 
 //create a process and put it on
 //the appropriate ready Q.
@@ -126,8 +149,15 @@ typedef struct semaphore{
 
 int main (){
 
-    char buffer;
+    //starting the clock for use in timing the processes
+    pthread_t tid;
+    if (pthread_create(&tid, NULL, &clock, NULL) != 0) {
+        printf("Failed to create thread.\n");
+        return 1;
+    }
 
+    //storage for getchar
+    char buffer;
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
@@ -240,4 +270,7 @@ int main (){
             }//end switch buffer
         }// end if(buffer != '\n')
     }//end while(buffer != '!')
+
+    //kill the thread
+    pthread_join(tid, NULL);
 }//end int main
