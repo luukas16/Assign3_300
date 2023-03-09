@@ -15,11 +15,13 @@ void * clock_func(){
     start_time = time(NULL);
 
     while (buffer != '!') {
-        printf("Elapsed time: %d seconds\n", elapsed_time);
         current_time = time(NULL);
         elapsed_time = (int) difftime(current_time, start_time);
-        sleep(1);
-        system("clear");
+
+        //make the program wait two seconds
+        //so the user has a chance to see what is going on
+        //and the program isn't moving too fast
+        sleep(2);
     }
 
     return NULL;
@@ -199,7 +201,10 @@ int main (){
                     break;      
                 case 'T':
                     Total_info(0);
-                    break;          
+                    break;  
+                case 'A':
+                    printf("Elapsed time: %d\n", elapsed_time);
+                    break;
                 //this will be the help section, if the user inputs H
                 //Then the program will print some helpful info
                 case 'H':
