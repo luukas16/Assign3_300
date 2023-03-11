@@ -10,7 +10,6 @@
 time_t start_time, current_time;
 int elapsed_time = 0;
 char buffer;
-int num_processes = 0;
 
     //the three priority queues
 List p0_list;
@@ -67,58 +66,54 @@ void print(List* pList){
         printf("<-");
         while(temp != NULL){
             pcb = temp->item;
-            printf("%d-", pcb->pid);
+            printf("%d-", (*pcb).pid);
             temp = temp->next;
         }
-        printf(">");
+        printf("> Queue length: %d", List_count(pList));
     }
     printf("\n");
 }
 
 //create a process and put it on
 //the appropriate ready Q.
-int Create(int priority){
-    num_processes++;
-
-    printf("The create function\n");
+int Create(int priority, int process_ID){
     struct PCB new_pcb;
 
     new_pcb.priority = priority;
     new_pcb.p_state = WAITING;
-    new_pcb.pid = num_processes;
+    new_pcb.pid = process_ID;
 
-    struct PCB * temp;
-    temp = &new_pcb;
 
     switch(priority){
         case 0:
-            List_append(&p0_list, temp);
+            List_append(&p0_list, &new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 1:
-            List_append(&p1_list, temp);
+            List_append(&p1_list, &new_pcb);
             if(List_count(&p1_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 2:
-            List_append(&p2_list, temp);
+            List_append(&p2_list, &new_pcb);
             if(List_count(&p2_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         default:
-            List_append(&p0_list, temp);
+            List_append(&p0_list, &new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
     };
+    printf("new process created with priority: %d, and process ID: %d\n", new_pcb.priority, new_pcb.pid);
 }
 
 //Copy the currently running
@@ -220,6 +215,7 @@ void printQueues(){
     print(&p1_list);
     printf("Priority 2: ");
     print(&p2_list);
+
 }
 
 int main (){
@@ -229,13 +225,6 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
 
-    struct PCB new;
-    new.priority = 2;
-    new.pid = 37;
-    struct PCB * temp = &new;
-
-    List_append(&p0_list, temp);
-    d_printList(&p0_list);
 
     //starting the clock for use in timing the processes
     pthread_t tid;
@@ -246,14 +235,23 @@ int main (){
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
+    int num, num2;
+    char priority_int[50];
+    char process_ID[50];
 
     while(buffer != '!'){
 
         buffer = getchar();
         if(buffer != '\n'){
-                switch(buffer){
+            switch(buffer){
                 case 'C':
-                    Create(0);
+                    printf("Please enter the priority of the new process. 0 = high, 1 = medium, 2 = low: ");
+                    scanf("%s", priority_int);
+                    num = atoi(priority_int);
+                    printf("Please enter a unique process ID for the new process: ");
+                    scanf("%s", process_ID);
+                    num2 = atoi(process_ID);
+                    Create(num, num2);
                     break;
                 case 'F':
                     Fork(0);
