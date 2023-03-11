@@ -10,11 +10,34 @@
 time_t start_time, current_time;
 int elapsed_time = 0;
 char buffer;
+int num_processes = 0;
 
     //the three priority queues
 List p0_list;
 List p1_list;
 List p2_list;
+
+//enum containing the possible states that a process can be in
+typedef enum {
+    RUNNING, WAITING, BLOCKED
+} State; 
+
+//Structure containing information about a specific process
+struct PCB {
+
+    int pid; //unique process identification number
+    int priority; //0 = high, 1 = medium, 2 = low
+    State p_state; // 
+
+    char * msg; //storage for string messages
+};
+
+//structure containing information about a specific semaphore
+typedef struct semaphore{
+
+    int sem_value; //unique identifier of the semaphore
+
+};
 //keeps track of the time in the program
 //used in the round robin scheduling and the time quantum
 void * clock_func(){
@@ -34,10 +57,68 @@ void * clock_func(){
     return NULL;
 }
 
+//DUMMY (for testing purposes only)
+void print(List* pList){
+    struct PCB *pcb;
+    if(pList == NULL){
+        printf("No items in the list.\n");
+    }else{
+        Node* temp = pList->head;
+        printf("<-");
+        while(temp != NULL){
+            pcb = temp->item;
+            printf("%d-", pcb->pid);
+            temp = temp->next;
+        }
+        printf(">");
+    }
+    printf("\n");
+}
+
 //create a process and put it on
 //the appropriate ready Q.
 int Create(int priority){
+    num_processes++;
+
     printf("The create function\n");
+    struct PCB new_pcb;
+
+    new_pcb.priority = priority;
+    new_pcb.p_state = WAITING;
+    new_pcb.pid = num_processes;
+
+    struct PCB * temp;
+    temp = &new_pcb;
+
+    switch(priority){
+        case 0:
+            List_append(&p0_list, temp);
+            if(List_count(&p0_list) == 0){
+                printf("Error in adding process to queue\n");
+                return -1;
+            }
+            break;
+        case 1:
+            List_append(&p1_list, temp);
+            if(List_count(&p1_list) == 0){
+                printf("Error in adding process to queue\n");
+                return -1;
+            }
+            break;
+        case 2:
+            List_append(&p2_list, temp);
+            if(List_count(&p2_list) == 0){
+                printf("Error in adding process to queue\n");
+                return -1;
+            }
+            break;
+        default:
+            List_append(&p0_list, temp);
+            if(List_count(&p0_list) == 0){
+                printf("Error in adding process to queue\n");
+                return -1;
+            }
+    };
 }
 
 //Copy the currently running
@@ -132,35 +213,14 @@ int Total_info(int priority){
 }
 
 void printQueues(){
+
     printf("Priority 0: ");
-    printList(&p0_list);
+    print(&p0_list);
     printf("Priority 1: ");
-    printList(&p1_list);
+    print(&p1_list);
     printf("Priority 2: ");
-    printList(&p2_list);
+    print(&p2_list);
 }
-
-//enum containing the possible states that a process can be in
-typedef enum {
-    RUNNING, WAITING, BLOCKED
-} State; 
-
-//Structure containing information about a specific process
-typedef struct PCB {
-
-    int pid; //unique process identification number
-    int priority; //0 = high, 1 = medium, 2 = low
-    State p_state; // 
-
-    char * msg; //storage for string messages
-};
-
-//structure containing information about a specific semaphore
-typedef struct semaphore{
-
-    int sem_value; //unique identifier of the semaphore
-
-};
 
 int main (){
 
@@ -169,16 +229,13 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
 
-    List_append(&p0_list, 2);
-    List_append(&p1_list, 3);
-    List_append(&p2_list, 6);
-    List_append(&p1_list, 67);
-    List_append(&p0_list, 90);
-    List_append(&p1_list, 5);
-    List_append(&p2_list, 76);
-    List_append(&p1_list, 16);
-    List_append(&p0_list, 4);
-    List_append(&p2_list, 5);
+    struct PCB new;
+    new.priority = 2;
+    new.pid = 37;
+    struct PCB * temp = &new;
+
+    List_append(&p0_list, temp);
+    d_printList(&p0_list);
 
     //starting the clock for use in timing the processes
     pthread_t tid;
