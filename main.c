@@ -12,10 +12,13 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
 
+    //struct PCB testing;
+    //testing.priority = 0;
+
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
-    int num, num2;
+    int num = -1, num2 = -1;
     char priority_int[50];
     char process_ID[50];
 
@@ -25,9 +28,11 @@ int main (){
         if(buffer != '\n'){
             switch(buffer){
                 case 'C':
-                    printf("Please enter the priority of the new process. 0 = high, 1 = medium, 2 = low: ");
-                    scanf("%s", priority_int);
-                    num = atoi(priority_int);
+                    while(num < 0 || num > 2){
+                        printf("Please enter the priority of the new process. 0 = high, 1 = medium, 2 = low: ");
+                        scanf("%s", priority_int);
+                        num = atoi(priority_int);
+                    }
                     printf("Please enter a unique process ID for the new process: ");
                     scanf("%s", process_ID);
                     num2 = atoi(process_ID);
