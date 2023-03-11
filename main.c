@@ -66,7 +66,7 @@ void print(List* pList){
         printf("<-");
         while(temp != NULL){
             pcb = temp->item;
-            printf("%d-", (*pcb).pid);
+            printf("%d-", pcb->pid);
             temp = temp->next;
         }
         printf("> Queue length: %d", List_count(pList));
@@ -77,43 +77,44 @@ void print(List* pList){
 //create a process and put it on
 //the appropriate ready Q.
 int Create(int priority, int process_ID){
-    struct PCB new_pcb;
+    struct PCB temp;
+    struct PCB *new_pcb = &temp;
 
-    new_pcb.priority = priority;
-    new_pcb.p_state = WAITING;
-    new_pcb.pid = process_ID;
+    new_pcb->priority = priority;
+    new_pcb->p_state = WAITING;
+    new_pcb->pid = process_ID;
 
 
     switch(priority){
         case 0:
-            List_append(&p0_list, &new_pcb);
+            List_append(&p0_list, new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 1:
-            List_append(&p1_list, &new_pcb);
+            List_append(&p1_list, new_pcb);
             if(List_count(&p1_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 2:
-            List_append(&p2_list, &new_pcb);
+            List_append(&p2_list, new_pcb);
             if(List_count(&p2_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         default:
-            List_append(&p0_list, &new_pcb);
+            List_append(&p0_list, new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
     };
-    printf("new process created with priority: %d, and process ID: %d\n", new_pcb.priority, new_pcb.pid);
+    printf("new process created with priority: %d, and process ID: %d\n", new_pcb->priority, new_pcb->pid);
 }
 
 //Copy the currently running
