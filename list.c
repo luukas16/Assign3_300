@@ -80,10 +80,12 @@ void printList(List* pList){
         printf("No items in the list.\n");
     }else{
         Node* temp = pList->head;
+        printf("<-");
         while(temp != NULL){
-            printf("%d ", *(int*)(temp)->item);
+            printf("%d-", temp->item);
             temp = temp->next;
         }
+        printf(">");
     }
     printf("\n");
 }

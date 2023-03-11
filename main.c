@@ -12,9 +12,9 @@ int elapsed_time = 0;
 char buffer;
 
     //the three priority queues
-List * p0_list;
-List * p1_list;
-List * p2_list;
+List p0_list;
+List p1_list;
+List p2_list;
 //keeps track of the time in the program
 //used in the round robin scheduling and the time quantum
 void * clock_func(){
@@ -131,33 +131,13 @@ int Total_info(int priority){
     printf("The total_info function\n");
 }
 
-void print_queues(){
-    printf("Priority 0: <-");
-    Node * temp = List_first(p0_list);
-    while(temp != NULL){
-        printf("Process(%d)", temp->item);
-        printf("-");
-        temp = temp->next;
-    }
-    printf(">\n");
-
-    printf("Priority 1: <-");
-    Node * temp2 = List_first(p1_list);
-    while(temp2 != NULL){
-        printf("Process(%d)", temp2->item);
-        printf("-");
-        temp2 = temp2->next;
-    }
-    printf(">\n");
-
-    printf("Priority 2: <-");
-    Node * temp3 = List_first(p2_list);
-    while(temp3 != NULL){
-        printf("Process(%d)", temp3->item);
-        printf("-");
-        temp3 = temp3->next;
-    }
-    printf(">\n");
+void printQueues(){
+    printf("Priority 0: ");
+    printList(&p0_list);
+    printf("Priority 1: ");
+    printList(&p1_list);
+    printf("Priority 2: ");
+    printList(&p2_list);
 }
 
 //enum containing the possible states that a process can be in
@@ -185,22 +165,20 @@ typedef struct semaphore{
 int main (){
 
 
-    p0_list = List_create();
-    p1_list = List_create();
-    p2_list = List_create();
+    p0_list = * List_create();
+    p1_list = * List_create();
+    p2_list = * List_create();
 
-    List_append(p0_list, 2);
-    List_append(p1_list, 3);
-    List_append(p2_list, 6);
-    List_append(p1_list, 67);
-    List_append(p0_list, 90);
-    List_append(p1_list, 5);
-    List_append(p2_list, 76);
-    List_append(p1_list, 16);
-    List_append(p0_list, 4);
-    List_append(p2_list, 5);
-
-    print_queues();
+    List_append(&p0_list, 2);
+    List_append(&p1_list, 3);
+    List_append(&p2_list, 6);
+    List_append(&p1_list, 67);
+    List_append(&p0_list, 90);
+    List_append(&p1_list, 5);
+    List_append(&p2_list, 76);
+    List_append(&p1_list, 16);
+    List_append(&p0_list, 4);
+    List_append(&p2_list, 5);
 
     //starting the clock for use in timing the processes
     pthread_t tid;
@@ -258,6 +236,9 @@ int main (){
                     break;  
                 case 'A':
                     printf("Elapsed time: %d\n", elapsed_time);
+                    break;
+                case 'B':
+                    printQueues();
                     break;
                 //this will be the help section, if the user inputs H
                 //Then the program will print some helpful info
