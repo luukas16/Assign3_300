@@ -12,8 +12,6 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
 
-    //struct PCB testing;
-    //testing.priority = 0;
 
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
@@ -37,6 +35,8 @@ int main (){
                     scanf("%s", process_ID);
                     num2 = atoi(process_ID);
                     Create(num, num2);
+                    num = -1;
+                    num2 = -1;
                     break;
                 case 'F':
                     Fork(0);

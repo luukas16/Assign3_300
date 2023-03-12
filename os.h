@@ -8,12 +8,12 @@
 
 #define BUFFER_SIZE 256
 
-char buffer;
+static char buffer;
 
 //the three priority queues
-List p0_list;
-List p1_list;
-List p2_list;
+static List p0_list;
+static List p1_list;
+static List p2_list;
 
 //enum containing the possible states that a process can be in
 typedef enum {

@@ -21,13 +21,11 @@ void print(List* pList){
 //create a process and put it on
 //the appropriate ready Q.
 int Create(int priority, int process_ID){
-    struct PCB temp;
-    struct PCB *new_pcb = &temp;
+    struct PCB *new_pcb = malloc(sizeof(struct PCB));
 
     new_pcb->priority = priority;
-    new_pcb->p_state = WAITING;
     new_pcb->pid = process_ID;
-
+    new_pcb->p_state = WAITING;
 
     switch(priority){
         case 0:
@@ -153,12 +151,10 @@ int Total_info(int priority){
 }
 
 void printQueues(){
-
     printf("Priority 0: ");
     print(&p0_list);
     printf("Priority 1: ");
     print(&p1_list);
     printf("Priority 2: ");
     print(&p2_list);
-
 }
