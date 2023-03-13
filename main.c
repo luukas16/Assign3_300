@@ -7,10 +7,15 @@
 
 int main (){
 
-
+    pcbs = * List_create();
     p0_list = * List_create();
     p1_list = * List_create();
     p2_list = * List_create();
+    Create(0, 1);// Creating the INIT process
+    print(&pcbs);
+    INIT = List_first(&pcbs);//INIT will be the first added to this list
+    current  = INIT;
+    INIT->p_state = RUNNING;
 
 
 
@@ -76,6 +81,9 @@ int main (){
                     break;  
                 case 'B':
                     printQueues();
+                    break;
+                case 'A':
+                    curr();
                     break;
                 //this will be the help section, if the user inputs H
                 //Then the program will print some helpful info

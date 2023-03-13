@@ -26,31 +26,35 @@ int Create(int priority, int process_ID){
     new_pcb->priority = priority;
     new_pcb->pid = process_ID;
     new_pcb->p_state = WAITING;
-
+    List_append(&pcbs, new_pcb);
+    print(&pcbs);
     switch(priority){
         case 0:
-            List_append(&p0_list, new_pcb);
+            List_prepend(&p0_list, new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 1:
-            List_append(&p1_list, new_pcb);
+
+            List_prepend(&p1_list, new_pcb);
             if(List_count(&p1_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         case 2:
-            List_append(&p2_list, new_pcb);
+
+            List_prepend(&p2_list, new_pcb);
             if(List_count(&p2_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
             }
             break;
         default:
-            List_append(&p0_list, new_pcb);
+
+            List_prepend(&p0_list, new_pcb);
             if(List_count(&p0_list) == 0){
                 printf("Error in adding process to queue\n");
                 return -1;
@@ -85,7 +89,34 @@ int Exit(int priority){
 //time quantum of running
 //process expires.
 int Quantum(int priority){
-    printf("The quantum function\n");
+    struct PCB * temp;
+    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
+    printf("Quantum expired, process with ID %d is no longer running\n", current->pid);
+    if(current->pid == 1){
+        INIT->p_state = WAITING;
+    }
+
+    //we first check the highest priority queue for processes to run and work our way down in priority
+    if(List_count(&p0_list) != 0 ){
+
+        current = List_trim(&p0_list);
+        current->p_state = RUNNING;
+
+    }else if(List_count(&p1_list) != 0){
+
+        current = List_trim(&p1_list);
+        current->p_state = RUNNING;
+
+    }else if(List_count(&p2_list) != 0){
+
+        current = List_trim(&p2_list);
+        current->p_state = RUNNING;
+
+    }else{//if no other process are available we will run the INIT process
+        current = INIT;
+        current->p_state = RUNNING;
+    }
+    printf("Now running process with ID %d\n", current->pid);
 }
 
 //send a message to another
@@ -157,4 +188,8 @@ void printQueues(){
     print(&p1_list);
     printf("Priority 2: ");
     print(&p2_list);
+}
+struct PCB * curr(){
+    printf("The currently running process: Process %d", current->pid);
+    return current;
 }

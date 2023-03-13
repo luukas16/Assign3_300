@@ -9,8 +9,11 @@
 #define BUFFER_SIZE 256
 
 static char buffer;
+struct PCB * current; //will point to the currently running process;
+struct PCB *INIT;
 
 //the three priority queues
+List pcbs;
 static List p0_list;
 static List p1_list;
 static List p2_list;
