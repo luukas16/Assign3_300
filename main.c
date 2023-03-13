@@ -12,7 +12,6 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
     Create(0, 1);// Creating the INIT process
-    print(&pcbs);
     INIT = List_first(&pcbs);//INIT will be the first added to this list
     current  = INIT;
     INIT->p_state = RUNNING;
@@ -44,40 +43,40 @@ int main (){
                     num2 = -1;
                     break;
                 case 'F':
-                    Fork(0);
+                    Fork();
                     break;
                 case 'K':
-                    Kill(0);
+                    Kill();
                     break;
                 case'E':
-                    Exit(0);
+                    Exit();
                     break;         
                 case 'Q':
-                    Quantum(0);
+                    Quantum();
                     break; 
                 case 'S':
-                    Send(0);
+                    Send();
                     break;           
                 case 'R':
-                    Receive(0);
+                    Receive();
                     break;            
                 case 'Y':
-                    Reply(0);
+                    Reply();
                     break;            
                 case 'N':
-                    New_semaphore(0);
+                    New_semaphore();
                     break;           
                 case 'P':
-                    P_semaphore(0);
+                    P_semaphore();
                     break;          
                 case 'V':
-                    V_semaphore(0);
+                    V_semaphore();
                     break;           
                 case 'I':
-                    Process_info(0);
+                    Process_info();
                     break;      
                 case 'T':
-                    Total_info(0);
+                    Total_info();
                     break;  
                 case 'B':
                     printQueues();

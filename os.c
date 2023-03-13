@@ -27,7 +27,7 @@ int Create(int priority, int process_ID){
     new_pcb->pid = process_ID;
     new_pcb->p_state = WAITING;
     List_append(&pcbs, new_pcb);
-    print(&pcbs);
+
     switch(priority){
         case 0:
             List_prepend(&p0_list, new_pcb);
@@ -70,26 +70,29 @@ int Create(int priority, int process_ID){
 //Attempting to Fork the "init"
 //process (see below) should
 //fail. 
-int Fork(int priority){
-    printf("The fork function\n");
+int Fork(){
+    if(current->pid != 1){
+        Create(current->priority, current->pid); 
+        return 0;//success
+    }
+    return -1;//errror
 }
 
 //kill the named process and
 //remove it from the system.
-int Kill(int priority){
+int Kill(){
     printf("The kill function\n");
 }
 
 //kill the currently running
 //process.
-int Exit(int priority){
+int Exit(){
     printf("The exit function\n");
 }
 
 //time quantum of running
 //process expires.
-int Quantum(int priority){
-    struct PCB * temp;
+int Quantum(){
     //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
     printf("Quantum expired, process with ID %d is no longer running\n", current->pid);
     if(current->pid == 1){
@@ -121,19 +124,19 @@ int Quantum(int priority){
 
 //send a message to another
 //process - block until reply
-int Send(int priority){
+int Send(){
     printf("The send function\n");
 }
 
 //receive a message - block until
 //one arrives
-int Receive(int priority){
+int Receive(){
     printf("The receive function\n");
 }
 
 //unblocks sender and delivers
 //reply
-int Reply(int priority){
+int Reply(){
     printf("The reply function\n");
 }
 
@@ -144,7 +147,7 @@ int Reply(int priority){
 //done once for a semaphore -
 //subsequent attempts result in
 //error.
-int New_semaphore(int priority){
+int New_semaphore(){
     printf("The new_semaphore function\n");
 }
 
@@ -153,7 +156,7 @@ int New_semaphore(int priority){
 //running process. You can
 //assume sempahores IDs
 //numbered 0 through 4.
-int P_semaphore(int priority){
+int P_semaphore(){
     printf("The p_semaphore function\n");
 }
 
@@ -162,7 +165,7 @@ int P_semaphore(int priority){
 //running process. You can
 //assume sempahores IDs
 //numbered 0 through 4.
-int V_semaphore(int priority){
+int V_semaphore(){
     printf("The v_semaphore function\n");
 }
 
@@ -171,13 +174,13 @@ int V_semaphore(int priority){
 //screen (this includes process
 //status and anything else you
 //can think of)
-int Process_info(int priority){
+int Process_info(){
     printf("The process_info function\n");
 }
 
 //display all process queues and
 //their contents
-int Total_info(int priority){
+int Total_info(){
     printf("The total_info function\n");
 }
 

@@ -55,31 +55,31 @@ int Create(int priority, int process_ID);
 //Attempting to Fork the "init"
 //process (see below) should
 //fail. 
-int Fork(int priority);
+int Fork();
 
 //kill the named process and
 //remove it from the system.
-int Kill(int priority);
+int Kill();
 
 //kill the currently running
 //process.
-int Exit(int priority);
+int Exit();
 
 //time quantum of running
 //process expires.
-int Quantum(int priority);
+int Quantum();
 
 //send a message to another
 //process - block until reply
-int Send(int priority);
+int Send();
 
 //receive a message - block until
 //one arrives
-int Receive(int priority);
+int Receive();
 
 //unblocks sender and delivers
 //reply
-int Reply(int priority);
+int Reply();
 
 //Initialize the named
 //semaphore with the value
@@ -88,31 +88,31 @@ int Reply(int priority);
 //done once for a semaphore -
 //subsequent attempts result in
 //error.
-int New_semaphore(int priority);
+int New_semaphore();
 
 //execute the semaphore P
 //operation on behalf of the
 //running process. You can
 //assume sempahores IDs
 //numbered 0 through 4.
-int P_semaphore(int priority);
+int P_semaphore();
 
 //execute the semaphore V
 //operation on behalf of the
 //running process. You can
 //assume sempahores IDs
 //numbered 0 through 4.
-int V_semaphore(int priority);
+int V_semaphore();
 
 //dump complete state
 //information of process to
 //screen (this includes process
 //status and anything else you
 //can think of)
-int Process_info(int priority);
+int Process_info();
 
 //display all process queues and
 //their contents
-int Total_info(int priority);
+int Total_info();
 
 void printQueues();
