@@ -161,40 +161,45 @@ int Quantum(){
 //process - block until reply
 int Send(int pid, char* msg){
     if(strlen(msg) > 40){
-        printf("AAAA: %ld\n", strlen(msg));
         return -1;
     }
 
-    struct PCB* temp1 = List_first(&p0_list);
-    struct PCB* temp2 = List_first(&p1_list);
-    struct PCB* temp3 = List_first(&p2_list);
+    struct PCB* temp0 = List_first(&p0_list);
+    struct PCB* temp1 = List_first(&p1_list);
+    struct PCB* temp2 = List_first(&p2_list);
 
-    struct PCB* processToBlock;
-
+    while(temp0 != NULL){
+        if(temp0->pid == pid){
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp0->msg = msg;
+            List_prepend(&blockedQueue, current);
+            List_remove(&p0_list);
+            return 1; 
+        }
+        temp0  = List_next(&p0_list);
+    }
     while(temp1 != NULL){
         if(temp1->pid == pid){
-            printf("Process with ID %d blocked. Waiting for response...\n", pid);
-            // processToBlock = List_remove(&p0_list);
-            // List_prepend(&blockedQueue, &processToBlock);
-            return 1; //process blocked
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp1->msg = msg;
+            List_prepend(&blockedQueue, current);
+            List_remove(&p1_list);
+            return 1; 
         }
-        temp1  = List_next(&p0_list);
+        temp1  = List_next(&p1_list);   
     }
     while(temp2 != NULL){
         if(temp2->pid == pid){
-            printf("Process found in priority 1 queue. Process ID %d deleted\n", temp2->pid);
-            List_remove(&p1_list);
-            return 1;//found and removed
-        }
-        temp2  = List_next(&p1_list);   
-    }
-    while(temp3 != NULL){
-        if(temp3->pid == pid){
-            printf("Process found in priority 2 queue. Process ID %d deleted\n", temp3->pid);
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp2->msg = msg;
+            List_prepend(&blockedQueue, current);
             List_remove(&p2_list);
-            return 1;//found and removed
+            return 1; 
         }
-        temp3  = List_next(&p2_list);
+        temp2  = List_next(&p2_list);
     }
 }
 
