@@ -101,16 +101,16 @@ int Kill(int pid){
         temp1  = List_next(&p0_list);
     }
     while(temp2 != NULL){
-            printf("Process found in priority 1 queue. Process ID %d deleted\n", temp2->pid);
         if(temp2->pid == pid){
+            printf("Process found in priority 1 queue. Process ID %d deleted\n", temp2->pid);
             List_remove(&p1_list);
             return 1;//found and removed
         }
         temp2  = List_next(&p1_list);   
     }
     while(temp3 != NULL){
-            printf("Process found in priority 2 queue. Process ID %d deleted\n", temp3->pid);
         if(temp3->pid == pid){
+            printf("Process found in priority 2 queue. Process ID %d deleted\n", temp3->pid);
             List_remove(&p2_list);
             return 1;//found and removed
         }
@@ -122,14 +122,14 @@ int Kill(int pid){
 //kill the currently running
 //process.
 int Exit(){
-
+    Quantum();
 }
 
 //time quantum of running
 //process expires.
 int Quantum(){
     //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
-    printf("Quantum expired, process with ID %d is no longer running\n", current->pid);
+    printf("Process with ID %d is no longer running\n", current->pid);
     if(current->pid == 1){
         INIT->p_state = WAITING;
     }
@@ -209,17 +209,56 @@ int V_semaphore(){
 //screen (this includes process
 //status and anything else you
 //can think of)
-int Process_info(){
-    printf("The process_info function\n");
+int Process_info(int pid){
+    struct PCB * temp1, *temp2, *temp3, *the_one;
+    temp1 = List_first(&p0_list);
+    temp2 = List_first(&p1_list);
+    temp3 = List_first(&p2_list);
+    bool found = false;
+
+    while(temp1 != NULL){
+        if(temp1->pid == pid){
+            found = true;
+            the_one = List_curr(&p0_list);
+        }
+        temp1  = List_next(&p0_list);
+    }
+    while(temp2 != NULL){
+        if(temp2->pid == pid){
+            found = true;
+            the_one = List_curr(&p1_list);
+        }
+        temp2  = List_next(&p1_list);   
+    }
+    while(temp3 != NULL){
+        if(temp3->pid == pid){
+            found = true;
+            the_one = List_curr(&p2_list);
+        }
+        temp3  = List_next(&p2_list);
+    }
+    if(found == true){
+        printf("The process with ID %d ", the_one->pid);
+        if(the_one->p_state == WAITING){
+            printf(" is currently Waiting on ready queue %d\n", the_one->priority);
+
+        }else if(the_one->p_state  == RUNNING){
+            printf("is currently running\n");
+        }else{
+            printf("is currently blocked\n");
+        }
+    }else{
+        if(current->pid == pid){
+            printf("The process listed is currently the running process\n");
+        }else{
+            printf("The process listed could not be found\n");
+        }
+    }
 }
 
 //display all process queues and
 //their contents
 int Total_info(){
-    printf("The total_info function\n");
-}
-
-void printQueues(){
     printf("Priority 0: ");
     print(&p0_list);
     printf("Priority 1: ");
@@ -227,6 +266,8 @@ void printQueues(){
     printf("Priority 2: ");
     print(&p2_list);
 }
+
+
 struct PCB * curr(){
     printf("The currently running process: Process %d", current->pid);
     return current;

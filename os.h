@@ -110,10 +110,9 @@ int V_semaphore();
 //screen (this includes process
 //status and anything else you
 //can think of)
-int Process_info();
+int Process_info(int pid);
 
 //display all process queues and
 //their contents
 int Total_info();
 
-void printQueues();

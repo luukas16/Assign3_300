@@ -21,8 +21,7 @@ int main (){
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
     int num = -1;
-    char process_id[50];
-    char priority_int[50];
+    char buff[50];
 
     while(buffer != '!'){
 
@@ -32,8 +31,8 @@ int main (){
                 case 'C':
                     while(num < 0 || num > 2){
                         printf("Please enter the priority of the new process. 0 = high, 1 = medium, 2 = low: ");
-                        scanf("%s", priority_int);
-                        num = atoi(priority_int);
+                        scanf("%s", buff);
+                        num = atoi(buff);
                     }
                     Create(num);
                     num = -1;
@@ -43,8 +42,8 @@ int main (){
                     break;
                 case 'K':
                     printf("Please enter the process ID of the process you wish to delete: ");
-                    scanf("%s", process_id);
-                    num = atoi(process_id);
+                    scanf("%s", buff);
+                    num = atoi(buff);
                     if(Kill(num) == false){
                         printf("Process with ID %d not found\n", num);
                     }
@@ -75,13 +74,14 @@ int main (){
                     V_semaphore();
                     break;           
                 case 'I':
-                    Process_info();
-                    break;      
+                    printf("Please enter the process ID of the process you wish information for: ");
+                    scanf("%s", buff);
+                    num = atoi(buff);
+                    Process_info(num);
+                    num = -1;
+                    break; 
                 case 'T':
                     Total_info();
-                    break;  
-                case 'B':
-                    printQueues();
                     break;
                 case 'A':
                     curr();
