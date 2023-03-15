@@ -1,247 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdbool.h>
-#include <time.h>
-#include <pthread.h>
+#include <string.h>
+#include "os.h"
 #include "list.h"
 
-#define BUFFER_SIZE 256
-time_t start_time, current_time;
-int elapsed_time = 0;
-char buffer;
-
-    //the three priority queues
-List p0_list;
-List p1_list;
-List p2_list;
-
-//enum containing the possible states that a process can be in
-typedef enum {
-    RUNNING, WAITING, BLOCKED
-} State; 
-
-//Structure containing information about a specific process
-struct PCB {
-
-    int pid; //unique process identification number
-    int priority; //0 = high, 1 = medium, 2 = low
-    State p_state; // 
-
-    char * msg; //storage for string messages
-};
-
-//structure containing information about a specific semaphore
-typedef struct semaphore{
-
-    int sem_value; //unique identifier of the semaphore
-
-};
-//keeps track of the time in the program
-//used in the round robin scheduling and the time quantum
-void * clock_func(){
-
-    start_time = time(NULL);
-
-    while (buffer != '!') {
-        current_time = time(NULL);
-        elapsed_time = (int) difftime(current_time, start_time);
-
-        //make the program wait two seconds
-        //so the user has a chance to see what is going on
-        //and the program isn't moving too fast
-        sleep(2);
-    }
-
-    return NULL;
-}
-
-//DUMMY (for testing purposes only)
-void print(List* pList){
-    struct PCB *pcb;
-    if(pList == NULL){
-        printf("No items in the list.\n");
-    }else{
-        Node* temp = pList->head;
-        printf("<-");
-        while(temp != NULL){
-            pcb = temp->item;
-            printf("%d-", pcb->pid);
-            temp = temp->next;
-        }
-        printf("> Queue length: %d", List_count(pList));
-    }
-    printf("\n");
-}
-
-//create a process and put it on
-//the appropriate ready Q.
-int Create(int priority, int process_ID){
-    struct PCB temp;
-    struct PCB *new_pcb = &temp;
-
-    new_pcb->priority = priority;
-    new_pcb->p_state = WAITING;
-    new_pcb->pid = process_ID;
-
-
-    switch(priority){
-        case 0:
-            List_append(&p0_list, new_pcb);
-            if(List_count(&p0_list) == 0){
-                printf("Error in adding process to queue\n");
-                return -1;
-            }
-            break;
-        case 1:
-            List_append(&p1_list, new_pcb);
-            if(List_count(&p1_list) == 0){
-                printf("Error in adding process to queue\n");
-                return -1;
-            }
-            break;
-        case 2:
-            List_append(&p2_list, new_pcb);
-            if(List_count(&p2_list) == 0){
-                printf("Error in adding process to queue\n");
-                return -1;
-            }
-            break;
-        default:
-            List_append(&p0_list, new_pcb);
-            if(List_count(&p0_list) == 0){
-                printf("Error in adding process to queue\n");
-                return -1;
-            }
-    };
-    printf("new process created with priority: %d, and process ID: %d\n", new_pcb->priority, new_pcb->pid);
-}
-
-//Copy the currently running
-//process and put it on the ready
-//Q corresponding to the
-//original process' priority.
-//Attempting to Fork the "init"
-//process (see below) should
-//fail. 
-int Fork(int priority){
-    printf("The fork function\n");
-}
-
-//kill the named process and
-//remove it from the system.
-int Kill(int priority){
-    printf("The kill function\n");
-}
-
-//kill the currently running
-//process.
-int Exit(int priority){
-    printf("The exit function\n");
-}
-
-//time quantum of running
-//process expires.
-int Quantum(int priority){
-    printf("The quantum function\n");
-}
-
-//send a message to another
-//process - block until reply
-int Send(int priority){
-    printf("The send function\n");
-}
-
-//receive a message - block until
-//one arrives
-int Receive(int priority){
-    printf("The receive function\n");
-}
-
-//unblocks sender and delivers
-//reply
-int Reply(int priority){
-    printf("The reply function\n");
-}
-
-//Initialize the named
-//semaphore with the value
-//given. ID's can take a value
-//from 0 to 4. This can only be
-//done once for a semaphore -
-//subsequent attempts result in
-//error.
-int New_semaphore(int priority){
-    printf("The new_semaphore function\n");
-}
-
-//execute the semaphore P
-//operation on behalf of the
-//running process. You can
-//assume sempahores IDs
-//numbered 0 through 4.
-int P_semaphore(int priority){
-    printf("The p_semaphore function\n");
-}
-
-//execute the semaphore V
-//operation on behalf of the
-//running process. You can
-//assume sempahores IDs
-//numbered 0 through 4.
-int V_semaphore(int priority){
-    printf("The v_semaphore function\n");
-}
-
-//dump complete state
-//information of process to
-//screen (this includes process
-//status and anything else you
-//can think of)
-int Process_info(int priority){
-    printf("The process_info function\n");
-}
-
-//display all process queues and
-//their contents
-int Total_info(int priority){
-    printf("The total_info function\n");
-}
-
-void printQueues(){
-
-    printf("Priority 0: ");
-    print(&p0_list);
-    printf("Priority 1: ");
-    print(&p1_list);
-    printf("Priority 2: ");
-    print(&p2_list);
-
-}
-
-// ---------------------------------------------- START OF MAIN --------------------------------------
-
 int main (){
-
-
+    pcbs = * List_create();
     p0_list = * List_create();
     p1_list = * List_create();
     p2_list = * List_create();
-
-
-    //starting the clock for use in timing the processes
-    pthread_t tid;
-    if (pthread_create(&tid, NULL, &clock_func, NULL) != 0) {
-        printf("Failed to create thread.\n");
-        return 1;
-    }
+    Create(0);// Creating the INIT process
+    struct PCB * current; //will point to the currently running process;
+    struct PCB *INIT;
+    INIT = List_first(&pcbs);//INIT will be the first added to this list
+    current  = INIT;
+    // INIT->p_state = RUNNING;
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
-    int num = -1; 
-    int num2 = -1;
-    char priority_int[50];
-    char process_ID[50];
+    int num = -1;
+    int pid = -1;
+    char buff[50];
+    char msg[40];
 
     while(buffer != '!'){
 
@@ -251,55 +31,94 @@ int main (){
                 case 'C':
                     while(num < 0 || num > 2){
                         printf("Please enter the priority of the new process. 0 = high, 1 = medium, 2 = low: ");
-                        scanf("%s", priority_int);
-                        num = atoi(priority_int);
+                        scanf("%s", buff);
+                        num = atoi(buff);
                     }
-                    printf("Please enter a unique process ID for the new process: ");
-                    scanf("%s", process_ID);
-                    num2 = atoi(process_ID);
-                    Create(num, num2);
+                    Create(num);
+                    num = -1;
                     break;
                 case 'F':
-                    Fork(0);
+                    Fork();
                     break;
                 case 'K':
-                    Kill(0);
+                    printf("Please enter the process ID of the process you wish to delete: ");
+                    scanf("%s", buff);
+                    num = atoi(buff);
+                    if(Kill(num) == false){
+                        printf("Process with ID %d not found\n", num);
+                    }
+                    num = -1;
                     break;
                 case'E':
-                    Exit(0);
+                    Exit();
                     break;         
                 case 'Q':
-                    Quantum(0);
+                    Quantum();
                     break; 
+
+
+
+
+
+
+
+
+
+
                 case 'S':
-                    Send(0);
-                    break;           
+                    while(pid < 0) {
+                        printf("Please enter pid of process you want to send message to: ");
+                        scanf("%s", buff);
+                        pid = atoi(buff);
+                    }
+                    printf("Please enter the message you want process with %d id to recieve: ", pid);
+                    scanf("%s", msg);
+                    
+                    printf("Length of string is: %ld\n", strlen(msg));
+
+                    Send(pid, msg);
+                    break;   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 case 'R':
-                    Receive(0);
+                    Receive();
                     break;            
                 case 'Y':
-                    Reply(0);
+                    Reply();
                     break;            
                 case 'N':
-                    New_semaphore(0);
+                    New_semaphore();
                     break;           
                 case 'P':
-                    P_semaphore(0);
+                    P_semaphore();
                     break;          
                 case 'V':
-                    V_semaphore(0);
+                    V_semaphore();
                     break;           
                 case 'I':
-                    Process_info(0);
-                    break;      
+                    printf("Please enter the process ID of the process you wish information for: ");
+                    scanf("%s", buff);
+                    num = atoi(buff);
+                    Process_info(num);
+                    num = -1;
+                    break; 
                 case 'T':
-                    Total_info(0);
-                    break;  
-                case 'A':
-                    printf("Elapsed time: %d\n", elapsed_time);
+                    Total_info();
                     break;
-                case 'B':
-                    printQueues();
+                case 'A':
+                    curr();
                     break;
                 //this will be the help section, if the user inputs H
                 //Then the program will print some helpful info
@@ -366,6 +185,4 @@ int main (){
         }// end if(buffer != '\n')
     }//end while(buffer != '!')
 
-    //kill the thread
-    pthread_join(tid, NULL);
 }//end int main
