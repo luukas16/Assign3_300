@@ -35,6 +35,7 @@ struct PCB {
     State p_state; // 
 
     char * msg; //storage for string messages
+    int sender_id;
 };
 
 //structure containing information about a specific semaphore
@@ -83,7 +84,7 @@ int Receive();
 
 //unblocks sender and delivers
 //reply
-int Reply();
+int Reply(int pid);
 
 //Initialize the named
 //semaphore with the value

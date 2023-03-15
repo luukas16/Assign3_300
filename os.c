@@ -173,6 +173,7 @@ int Send(int pid, char* msg){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             current->p_state = BLOCKED;
             temp0->msg = msg;
+            temp0->sender_id = pid;
             List_prepend(&blockedQueue, current);
             List_remove(&p0_list);
             return 1; 
@@ -184,6 +185,7 @@ int Send(int pid, char* msg){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             current->p_state = BLOCKED;
             temp1->msg = msg;
+            temp1->sender_id = pid;
             List_prepend(&blockedQueue, current);
             List_remove(&p1_list);
             return 1; 
@@ -195,6 +197,7 @@ int Send(int pid, char* msg){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             current->p_state = BLOCKED;
             temp2->msg = msg;
+            temp2->sender_id = pid;
             List_prepend(&blockedQueue, current);
             List_remove(&p2_list);
             return 1; 
@@ -206,13 +209,40 @@ int Send(int pid, char* msg){
 //receive a message - block until
 //one arrives
 int Receive(){
+    if(current->msg != NULL){
+        printf("Message recieved by process %d!!", current->sender_id);
+    }else{
+        current->p_state = BLOCKED;
+        List_prepend(&blockedQueue, current);
+        Exit();
+    }
     printf("The receive function\n");
 }
 
 //unblocks sender and delivers
 //reply
-int Reply(){
-    printf("The reply function\n");
+int Reply(int pid){
+    struct PCB* temp = List_first(&blockedQueue);
+
+    while(temp != NULL){
+        if(temp->pid == pid){
+            printf("Sending a reply to process with id %d\n", pid);
+            temp->p_state = WAITING;
+            temp->msg = NULL;
+            temp->sender_id = -1;
+            List_remove(&blockedQueue);
+
+            if(temp->priority == 0){
+                List_prepend(&p0_list, temp);
+            }else if(temp->priority == 1){
+                List_prepend(&p1_list, temp);
+            }else if(temp->priority == 2)
+                List_prepend(&p2_list, temp);
+            return 1; 
+        }
+        temp  = List_next(&p0_list);
+    }
+    printf("Process not found");
 }
 
 //Initialize the named

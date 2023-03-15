@@ -55,16 +55,6 @@ int main (){
                 case 'Q':
                     Quantum();
                     break; 
-
-
-
-
-
-
-
-
-
-
                 case 'S':
                     while(pid < 0) {
                         printf("Please enter pid of process you want to send message to: ");
@@ -77,26 +67,17 @@ int main (){
                     printf("Length of string is: %ld\n", strlen(msg));
 
                     Send(pid, msg);
+                    pid = -1;
                     break;   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
                 case 'R':
                     Receive();
                     break;            
                 case 'Y':
-                    Reply();
+                    printf("Please enter pid of process you want to send message to: ");
+                    scanf("%s", buff);
+                    pid = atoi(buff);
+                    Reply(pid);
+                    pid = -1;
                     break;            
                 case 'N':
                     New_semaphore();
