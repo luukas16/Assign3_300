@@ -247,6 +247,7 @@ int Process_info(int pid){
         }else{
             printf("is currently blocked\n");
         }
+        the_one = NULL;
     }else{
         if(current->pid == pid){
             printf("The process listed is currently the running process\n");
