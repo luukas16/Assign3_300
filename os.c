@@ -27,12 +27,17 @@ int Create(int priority){
     new_pcb->priority = priority;
     new_pcb->pid = process;
     new_pcb->p_state = WAITING;
-    List_append(&pcbs, new_pcb);
 
 
     if(process == 1){
+        INIT = new_pcb;
+        current  = INIT;
+        INIT->p_state = RUNNING;
+        List_prepend(&pcbs, new_pcb);
         return 0;//success
     }//else handle the creation of a real process
+
+    List_prepend(&pcbs, new_pcb);
 
     switch(priority){
         case 0:

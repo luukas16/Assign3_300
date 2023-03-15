@@ -14,7 +14,7 @@ struct PCB *INIT;
 static int process = 0;
 
 //the three priority queues
-List pcbs;
+static List pcbs;
 static List p0_list;
 static List p1_list;
 static List p2_list;

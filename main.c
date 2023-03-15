@@ -12,10 +12,6 @@ int main (){
     p1_list = * List_create();
     p2_list = * List_create();
     Create(0);// Creating the INIT process
-    INIT = List_first(&pcbs);//INIT will be the first added to this list
-    current  = INIT;
-    INIT->p_state = RUNNING;
-
 
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
