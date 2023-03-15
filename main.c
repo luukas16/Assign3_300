@@ -11,7 +11,7 @@ int main (){
     p0_list = * List_create();
     p1_list = * List_create();
     p2_list = * List_create();
-    Create(0, 1);// Creating the INIT process
+    Create(0);// Creating the INIT process
     INIT = List_first(&pcbs);//INIT will be the first added to this list
     current  = INIT;
     INIT->p_state = RUNNING;
@@ -20,9 +20,9 @@ int main (){
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
-    int num = -1, num2 = -1;
+    int num = -1;
+    char process_id[50];
     char priority_int[50];
-    char process_ID[50];
 
     while(buffer != '!'){
 
@@ -35,18 +35,20 @@ int main (){
                         scanf("%s", priority_int);
                         num = atoi(priority_int);
                     }
-                    printf("Please enter a unique process ID for the new process: ");
-                    scanf("%s", process_ID);
-                    num2 = atoi(process_ID);
-                    Create(num, num2);
+                    Create(num);
                     num = -1;
-                    num2 = -1;
                     break;
                 case 'F':
                     Fork();
                     break;
                 case 'K':
-                    Kill();
+                    printf("Please enter the process ID of the process you wish to delete: ");
+                    scanf("%s", process_id);
+                    num = atoi(process_id);
+                    if(Kill(num) == false){
+                        printf("Process with ID %d not found\n", num);
+                    }
+                    num = -1;
                     break;
                 case'E':
                     Exit();

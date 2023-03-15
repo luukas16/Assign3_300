@@ -11,6 +11,7 @@
 static char buffer;
 struct PCB * current; //will point to the currently running process;
 struct PCB *INIT;
+static int process = 0;
 
 //the three priority queues
 List pcbs;
@@ -46,7 +47,7 @@ void print(List* pList);
 
 //create a process and put it on
 //the appropriate ready Q.
-int Create(int priority, int process_ID);
+int Create(int priority);
 
 //Copy the currently running
 //process and put it on the ready
@@ -59,7 +60,7 @@ int Fork();
 
 //kill the named process and
 //remove it from the system.
-int Kill();
+int Kill(int pid);
 
 //kill the currently running
 //process.

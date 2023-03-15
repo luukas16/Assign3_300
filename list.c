@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "list.h"
+#include "os.h"
 
 static List lists[LIST_MAX_NUM_HEADS];
 static Node nodes[LIST_MAX_NUM_NODES];

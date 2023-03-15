@@ -20,13 +20,19 @@ void print(List* pList){
 
 //create a process and put it on
 //the appropriate ready Q.
-int Create(int priority, int process_ID){
+int Create(int priority){
+    process++;
     struct PCB *new_pcb = malloc(sizeof(struct PCB));
 
     new_pcb->priority = priority;
-    new_pcb->pid = process_ID;
+    new_pcb->pid = process;
     new_pcb->p_state = WAITING;
     List_append(&pcbs, new_pcb);
+
+
+    if(process == 1){
+        return 0;//success
+    }//else handle the creation of a real process
 
     switch(priority){
         case 0:
@@ -72,7 +78,7 @@ int Create(int priority, int process_ID){
 //fail. 
 int Fork(){
     if(current->pid != 1){
-        Create(current->priority, current->pid); 
+        Create(current->priority); 
         return 0;//success
     }
     return -1;//errror
@@ -80,14 +86,43 @@ int Fork(){
 
 //kill the named process and
 //remove it from the system.
-int Kill(){
-    printf("The kill function\n");
+int Kill(int pid){
+    struct PCB * temp1, *temp2, *temp3;
+    temp1 = List_first(&p0_list);
+    temp2 = List_first(&p1_list);
+    temp3 = List_first(&p2_list);
+
+    while(temp1 != NULL){
+        if(temp1->pid == pid){
+            printf("Process found in priority 0 queue. Process ID %d deleted\n", temp1->pid);
+            List_remove(&p0_list);
+            return 1;//found and removed
+        }
+        temp1  = List_next(&p0_list);
+    }
+    while(temp2 != NULL){
+            printf("Process found in priority 1 queue. Process ID %d deleted\n", temp2->pid);
+        if(temp2->pid == pid){
+            List_remove(&p1_list);
+            return 1;//found and removed
+        }
+        temp2  = List_next(&p1_list);   
+    }
+    while(temp3 != NULL){
+            printf("Process found in priority 2 queue. Process ID %d deleted\n", temp3->pid);
+        if(temp3->pid == pid){
+            List_remove(&p2_list);
+            return 1;//found and removed
+        }
+        temp3  = List_next(&p2_list);
+    }
+    return 0; //nothing found
 }
 
 //kill the currently running
 //process.
 int Exit(){
-    printf("The exit function\n");
+
 }
 
 //time quantum of running
