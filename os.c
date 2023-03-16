@@ -178,12 +178,18 @@ int Quantum(){
     printf("Quantum expired!\n");
     printf("Process with ID %d is no longer running. ", current->pid);
 
-    if(current->pid != 1){
+    if(current->pid != 1 && current->p_state != BLOCKED){
+
         if(current->priority == 0){
+
             List_prepend(&p0_list, current);
+
         }else if(current->priority == 1){
+
             List_prepend(&p1_list, current);
+
         }else if(current->priority == 2){
+
             List_prepend(&p2_list, current);
         }
     }
@@ -207,22 +213,33 @@ int Quantum(){
 //send a message to another
 //process - block until reply
 int Send(int pid, char* msg){
+
+    //if the message is too long we will not send it
     if(strlen(msg) > 40){
         return -1;
     }
-
+    
     struct PCB* temp0 = List_first(&p0_list);
     struct PCB* temp1 = List_first(&p1_list);
     struct PCB* temp2 = List_first(&p2_list);
 
+    //searching for the desired process
     while(temp0 != NULL){
+
+        //process found
         if(temp0->pid == pid){
+
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            //we block the sender
             current->p_state = BLOCKED;
+
+            //we give the message to the receiver and the ID of the sender
             temp0->msg = msg;
             temp0->sender_id = pid;
+
+            //we add the sender to a blocked queue and 
             List_prepend(&blockedQueue, current);
-            List_remove(&p0_list);
+            Quantum();//Replace the current process as it has been blocked
             return 1; 
         }
         temp0  = List_next(&p0_list);
@@ -234,7 +251,7 @@ int Send(int pid, char* msg){
             temp1->msg = msg;
             temp1->sender_id = pid;
             List_prepend(&blockedQueue, current);
-            List_remove(&p1_list);
+            Quantum();
             return 1; 
         }
         temp1  = List_next(&p1_list);   
@@ -246,7 +263,7 @@ int Send(int pid, char* msg){
             temp2->msg = msg;
             temp2->sender_id = pid;
             List_prepend(&blockedQueue, current);
-            List_remove(&p2_list);
+            Quantum();
             return 1; 
         }
         temp2  = List_next(&p2_list);
@@ -257,13 +274,13 @@ int Send(int pid, char* msg){
 //one arrives
 int Receive(){
     if(current->msg != NULL){
-        printf("Message recieved by process %d!!", current->sender_id);
+        printf("Message received by process %d!!", current->sender_id);
+        printf("Message received: %s\n", current->msg);
     }else{
         current->p_state = BLOCKED;
         List_prepend(&blockedQueue, current);
         Exit();
     }
-    printf("The receive function\n");
 }
 
 //unblocks sender and delivers
