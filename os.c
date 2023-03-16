@@ -114,6 +114,7 @@ int Kill(int pid){
         if(temp1->pid == pid){
             printf("Process found in priority 0 queue. Process ID %d deleted\n", temp1->pid);
             List_remove(&p0_list);
+            //<-2-4->
 
             //if all queues are empty switch back to the INIT process
             if(all_empty() == true){
@@ -193,16 +194,19 @@ int Quantum(){
             List_prepend(&p2_list, current);
         }
     }
+    struct PCB * temp = List_curr(&p0_list);
+    struct PCB * temp2 = List_curr(&p1_list);
+    struct PCB * temp3 = List_curr(&p2_list);
 
-    if(List_count(&p0_list) != 0){
+    if(List_count(&p0_list) != 0 && temp->pid != current->pid){
 
         current = List_trim(&p0_list);
 
-    }else if(List_count(&p1_list) != 0){
+    }else if(List_count(&p1_list) != 0 && temp2->pid != current->pid){
 
         current = List_trim(&p1_list);
 
-    }else if(List_count(&p2_list)!= 0){
+    }else if(List_count(&p2_list)!= 0 && temp3->pid != current->pid){
 
         current = List_trim(&p2_list);
     }
@@ -274,7 +278,7 @@ int Send(int pid, char* msg){
 //one arrives
 int Receive(){
     if(current->msg != NULL){
-        printf("Message received by process %d!!", current->sender_id);
+        printf("Message received by process %d ", current->sender_id);
         printf("Message received: %s\n", current->msg);
     }else{
         current->p_state = BLOCKED;
