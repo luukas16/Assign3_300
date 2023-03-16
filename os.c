@@ -160,7 +160,7 @@ int Kill(int pid){
 int Exit(){
     //If the process is the INIT call quantum
     if(current->pid ==1){
-        Quantum();
+        printf("Cannot Kill the INIT process.\n");
         return 1;
     }
     //Check if the process about to be killed has a message
@@ -169,7 +169,6 @@ int Exit(){
     
     //call quantum
     Kill(current->pid);//kill the son of a bitch!!!!
-    Quantum();
     return 1;
 }
 
@@ -177,7 +176,7 @@ int Exit(){
 //process expires.
 int Quantum(){
     printf("Quantum expired!\n");
-    printf("Process with ID %d is no longer running\n", current->pid);
+    printf("Process with ID %d is no longer running. ", current->pid);
 
     if(current->pid != 1){
         if(current->priority == 0){
@@ -201,6 +200,7 @@ int Quantum(){
 
         current = List_trim(&p2_list);
     }
+    printf("Now running process %d\n", current->pid);
     return 1;
 }
 
