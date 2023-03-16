@@ -177,40 +177,53 @@ int Exit(){
 //process expires.
 int Quantum(){
     printf("Quantum expired!\n");
-    printf("Process with ID %d is no longer running. ", current->pid);
+    printf("Process with ID %d is giving the CPU to", current->pid);
+    struct PCB * temp = current;
+    //first step
+    //check if there are any processes waiting that can replace the currently running process
+    //if not, and if the current process hasn't been blocked, then we keep running the current process
+    if((List_count(&p0_list) != 0 || List_count(&p1_list) != 0 || List_count(&p2_list) != 0)){
+        //if we make inside this if block that means there is another process on one of the lists 
+        //meaning we have at least one process guaranteed to replace the current running process
 
-    if(current->pid != 1 && current->p_state != BLOCKED){
+        //now we check which list has the new process
+        //we are guaranteed one process as we made it into the if
+        if(List_count(&p0_list) != 0){
 
-        if(current->priority == 0){
+            current = List_trim(&p0_list);
 
-            List_prepend(&p0_list, current);
+        }else if(List_count(&p1_list) != 0){
 
-        }else if(current->priority == 1){
+            current = List_trim(&p1_list);
 
-            List_prepend(&p1_list, current);
-
-        }else if(current->priority == 2){
-
-            List_prepend(&p2_list, current);
+        }else{
+            current = List_trim(&p2_list);
         }
+
+
+        //we must place the running process back on the correct list if it hasn't been blocked
+        if(temp->p_state != BLOCKED && temp->pid != 1){
+            if(temp->priority == 0){
+
+                List_prepend(&p0_list, temp);
+
+            }else if(temp->priority == 1){
+
+                List_prepend(&p1_list, temp);
+
+            }else{
+
+                List_prepend(&p2_list, temp);
+            }
+        }
+
+    }else if(current->p_state == BLOCKED){
+        //if we make it inside this if else block then there are no other process available
+        //and the current process is being blocked on some condition
+        //thus we must switch back to the INIT process
+        current = INIT;
     }
-    struct PCB * temp = List_curr(&p0_list);
-    struct PCB * temp2 = List_curr(&p1_list);
-    struct PCB * temp3 = List_curr(&p2_list);
-
-    if(List_count(&p0_list) != 0 && temp->pid != current->pid){
-
-        current = List_trim(&p0_list);
-
-    }else if(List_count(&p1_list) != 0 && temp2->pid != current->pid){
-
-        current = List_trim(&p1_list);
-
-    }else if(List_count(&p2_list)!= 0 && temp3->pid != current->pid){
-
-        current = List_trim(&p2_list);
-    }
-    printf("Now running process %d\n", current->pid);
+    printf(" process %d\n", current->pid);
     return 1;
 }
 
