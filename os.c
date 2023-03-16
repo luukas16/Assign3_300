@@ -1,6 +1,12 @@
 #include "os.h"
 
+bool all_empty(){
 
+    if(List_count(&p0_list) == 0 && List_count(&p1_list) == 0 && List_count(&p2_list) == 0 ){
+        return true;
+    }
+    return false;
+}
 
 //create a process and put it on
 //the appropriate ready Q.
@@ -81,10 +87,39 @@ int Kill(int pid){
     temp2 = List_first(&p1_list);
     temp3 = List_first(&p2_list);
 
+
+    //process is currently running
+    if(current->pid = pid){
+        if(List_count(&p0_list) != 0){
+
+            current = List_trim(&p0_list);
+
+        }else if(List_count(&p1_list) != 0){
+
+            current = List_trim(&p1_list);
+            
+        }else if(List_count(&p2_list)!= 0){
+
+            current = List_trim(&p2_list);
+        }
+        //if all queues are empty switch back to the INIT process
+        else if(all_empty() == true){
+                current = INIT;
+        }
+        printf("Current process updated. Now running %d\n", current->pid);
+        return 1;
+    } 
+
     while(temp1 != NULL){
         if(temp1->pid == pid){
             printf("Process found in priority 0 queue. Process ID %d deleted\n", temp1->pid);
             List_remove(&p0_list);
+
+            //if all queues are empty switch back to the INIT process
+            if(all_empty() == true){
+                current = INIT;
+            }
+            printf("Current process updated. Now running %d\n", current->pid);
             return 1;//found and removed
         }
         temp1  = List_next(&p0_list);
@@ -93,6 +128,12 @@ int Kill(int pid){
         if(temp2->pid == pid){
             printf("Process found in priority 1 queue. Process ID %d deleted\n", temp2->pid);
             List_remove(&p1_list);
+
+            //if all queues are empty switch back to the INIT process
+            if(all_empty() == true){
+                current = INIT;
+            }
+            printf("Current process updated. Now running %d\n", current->pid);
             return 1;//found and removed
         }
         temp2  = List_next(&p1_list);   
@@ -101,6 +142,12 @@ int Kill(int pid){
         if(temp3->pid == pid){
             printf("Process found in priority 2 queue. Process ID %d deleted\n", temp3->pid);
             List_remove(&p2_list);
+
+            //if all queues are empty switch back to the INIT process
+            if(all_empty() == true){
+                current = INIT;
+            }
+            printf("Current process updated. Now running %d\n", current->pid);
             return 1;//found and removed
         }
         temp3  = List_next(&p2_list);
@@ -111,66 +158,24 @@ int Kill(int pid){
 //kill the currently running
 //process.
 int Exit(){
-
-    free(current);
-
-    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
-    // printf("Process with ID %d is no longer running\n", current->pid);
-    // if(current->pid == 1){
-    //     INIT->p_state = WAITING;
-    // }
-
-    // //we first check the highest priority queue for processes to run and work our way down in priority
-    // if(List_count(&p0_list) != 0 ){
-
-    //     current = List_trim(&p0_list);
-    //     current->p_state = RUNNING;
-
-    // }else if(List_count(&p1_list) != 0){
-
-    //     current = List_trim(&p1_list);
-    //     current->p_state = RUNNING;
-
-    // }else if(List_count(&p2_list) != 0){
-
-    //     current = List_trim(&p2_list);
-    //     current->p_state = RUNNING;
-    //current->priority == 2;
-    // }else{//if no other process are available we will run the INIT process
-    //     current = INIT;
-    //     current->p_state = RUNNING;
-    // }
-    // printf("Now running process with ID %d\n", current->pid);
+    //If the process is the INIT call quantum
+    if(current->pid ==1){
+        Quantum();
+        return 1;
+    }
+    //Check if the process about to be killed has a message
+        //-> If they wish to continue with kill
+        //->If they do not wish to kill
+    
+    //call quantum
+    Kill(current->pid);//kill the son of a bitch!!!!
+    Quantum();
+    return 1;
 }
 
 //time quantum of running
 //process expires.
 int Quantum(){
-/*
-    struct PCB * temp = current;
-    printf("Quantum expired!\n");
-
-    printf("Process with ID %d is no longer running.", current->pid);
-
-    if(List_count(&p0_list) != 0){
-
-        current = List_trim(&p0_list);
-        List_prepend(&p0_list, temp);
-
-    }else if(List_count(&p1_list) != 0 ){
-
-        current = List_trim(&p1_list);
-        List_prepend(&p1_list, temp);
-
-    }else if(List_count(&p2_list) != 0){
-
-        current = List_trim(&p2_list);
-        List_prepend(&p2_list, temp);
-    }
-
-    printf(" Now running process %d.\n", current->pid);
-    return 1; 
-*/
     printf("Quantum expired!\n");
     printf("Process with ID %d is no longer running\n", current->pid);
 
@@ -185,10 +190,15 @@ int Quantum(){
     }
 
     if(List_count(&p0_list) != 0){
+
         current = List_trim(&p0_list);
-    }else if(List_count(&p1_list)){
+
+    }else if(List_count(&p1_list) != 0){
+
         current = List_trim(&p1_list);
-    }else if(List_count(&p2_list)){
+
+    }else if(List_count(&p2_list)!= 0){
+
         current = List_trim(&p2_list);
     }
     return 1;
