@@ -29,7 +29,6 @@ typedef enum {
 
 //Structure containing information about a specific process
 struct PCB {
-
     int pid; //unique process identification number
     int priority; //0 = high, 1 = medium, 2 = low
     State p_state; // 
@@ -40,9 +39,7 @@ struct PCB {
 
 //structure containing information about a specific semaphore
 typedef struct semaphore{
-
     int sem_value; //unique identifier of the semaphore
-
 };
 
 

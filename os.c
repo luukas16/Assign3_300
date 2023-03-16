@@ -1,23 +1,5 @@
 #include "os.h"
 
-//DUMMY (for testing purposes only)
-void print(List* pList){
-    struct PCB *pcb;
-    if(pList == NULL){
-        printf("No items in the list.\n");
-    }else{
-        Node* temp = pList->head;
-        printf("<-");
-        while(temp != NULL){
-            pcb = temp->item;
-            printf("%d-", pcb->pid);
-            temp = temp->next;
-        }
-        printf("> Queue length: %d", List_count(pList));
-    }
-    printf("\n");
-}
-
 //create a process and put it on
 //the appropriate ready Q.
 int Create(int priority){
@@ -27,12 +9,16 @@ int Create(int priority){
     new_pcb->priority = priority;
     new_pcb->pid = process;
     new_pcb->p_state = WAITING;
-    List_append(&pcbs, new_pcb);
-
 
     if(process == 1){
+        INIT = new_pcb;
+        current  = INIT;
+        INIT->p_state = RUNNING;
+        List_prepend(&pcbs, new_pcb);
         return 0;//success
     }//else handle the creation of a real process
+
+    List_prepend(&pcbs, new_pcb);
 
     switch(priority){
         case 0:
@@ -122,39 +108,53 @@ int Kill(int pid){
 //kill the currently running
 //process.
 int Exit(){
-    Quantum();
+
+    free(current);
+
+    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
+    // printf("Process with ID %d is no longer running\n", current->pid);
+    // if(current->pid == 1){
+    //     INIT->p_state = WAITING;
+    // }
+
+    // //we first check the highest priority queue for processes to run and work our way down in priority
+    // if(List_count(&p0_list) != 0 ){
+
+    //     current = List_trim(&p0_list);
+    //     current->p_state = RUNNING;
+
+    // }else if(List_count(&p1_list) != 0){
+
+    //     current = List_trim(&p1_list);
+    //     current->p_state = RUNNING;
+
+    // }else if(List_count(&p2_list) != 0){
+
+    //     current = List_trim(&p2_list);
+    //     current->p_state = RUNNING;
+
+    // }else{//if no other process are available we will run the INIT process
+    //     current = INIT;
+    //     current->p_state = RUNNING;
+    // }
+    // printf("Now running process with ID %d\n", current->pid);
 }
 
 //time quantum of running
 //process expires.
 int Quantum(){
-    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
+    printf("Quantum expired!\n");
     printf("Process with ID %d is no longer running\n", current->pid);
-    if(current->pid == 1){
-        INIT->p_state = WAITING;
-    }
-
-    //we first check the highest priority queue for processes to run and work our way down in priority
-    if(List_count(&p0_list) != 0 ){
-
+    if(current->priority == 0){
+        List_prepend(&p0_list, current);
         current = List_trim(&p0_list);
-        current->p_state = RUNNING;
-
-    }else if(List_count(&p1_list) != 0){
-
-        current = List_trim(&p1_list);
-        current->p_state = RUNNING;
-
-    }else if(List_count(&p2_list) != 0){
-
-        current = List_trim(&p2_list);
-        current->p_state = RUNNING;
-
-    }else{//if no other process are available we will run the INIT process
-        current = INIT;
-        current->p_state = RUNNING;
-    }
-    printf("Now running process with ID %d\n", current->pid);
+    }else if(current->priority == 1){
+        List_prepend(&p1_list, current);
+        current = List_trim(&p0_list);
+    }else if(current->priority == 2)
+        List_prepend(&p2_list, current);
+        current = List_trim(&p0_list);
+    return 1; 
 }
 
 //send a message to another
@@ -342,4 +342,23 @@ int Total_info(){
 struct PCB * curr(){
     printf("The currently running process: Process %d", current->pid);
     return current;
+}
+
+
+//DUMMY (for testing purposes only)
+void print(List* pList){
+    struct PCB *pcb;
+    if(pList == NULL){
+        printf("No items in the list.\n");
+    }else{
+        Node* temp = pList->head;
+        printf("<-");
+        while(temp != NULL){
+            pcb = temp->item;
+            printf("%d-", pcb->pid);
+            temp = temp->next;
+        }
+        printf("> Queue length: %d", List_count(pList));
+    }
+    printf("\n");
 }
