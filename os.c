@@ -1,22 +1,6 @@
 #include "os.h"
 
-//DUMMY (for testing purposes only)
-void print(List* pList){
-    struct PCB *pcb;
-    if(pList == NULL){
-        printf("No items in the list.\n");
-    }else{
-        Node* temp = pList->head;
-        printf("<-");
-        while(temp != NULL){
-            pcb = temp->item;
-            printf("%d-", pcb->pid);
-            temp = temp->next;
-        }
-        printf("> Queue length: %d", List_count(pList));
-    }
-    printf("\n");
-}
+
 
 //create a process and put it on
 //the appropriate ready Q.
@@ -127,57 +111,175 @@ int Kill(int pid){
 //kill the currently running
 //process.
 int Exit(){
-    Quantum();
+
+    free(current);
+
+    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
+    // printf("Process with ID %d is no longer running\n", current->pid);
+    // if(current->pid == 1){
+    //     INIT->p_state = WAITING;
+    // }
+
+    // //we first check the highest priority queue for processes to run and work our way down in priority
+    // if(List_count(&p0_list) != 0 ){
+
+    //     current = List_trim(&p0_list);
+    //     current->p_state = RUNNING;
+
+    // }else if(List_count(&p1_list) != 0){
+
+    //     current = List_trim(&p1_list);
+    //     current->p_state = RUNNING;
+
+    // }else if(List_count(&p2_list) != 0){
+
+    //     current = List_trim(&p2_list);
+    //     current->p_state = RUNNING;
+    //current->priority == 2;
+    // }else{//if no other process are available we will run the INIT process
+    //     current = INIT;
+    //     current->p_state = RUNNING;
+    // }
+    // printf("Now running process with ID %d\n", current->pid);
 }
 
 //time quantum of running
 //process expires.
 int Quantum(){
-    //when the quantum function is called it is treated as the end of a time quantum and thus the CPU needs to be updated
-    printf("Process with ID %d is no longer running\n", current->pid);
-    if(current->pid == 1){
-        INIT->p_state = WAITING;
-    }
+/*
+    struct PCB * temp = current;
+    printf("Quantum expired!\n");
 
-    //we first check the highest priority queue for processes to run and work our way down in priority
-    if(List_count(&p0_list) != 0 ){
+    printf("Process with ID %d is no longer running.", current->pid);
+
+    if(List_count(&p0_list) != 0){
 
         current = List_trim(&p0_list);
-        current->p_state = RUNNING;
+        List_prepend(&p0_list, temp);
 
-    }else if(List_count(&p1_list) != 0){
+    }else if(List_count(&p1_list) != 0 ){
 
         current = List_trim(&p1_list);
-        current->p_state = RUNNING;
+        List_prepend(&p1_list, temp);
 
     }else if(List_count(&p2_list) != 0){
 
         current = List_trim(&p2_list);
-        current->p_state = RUNNING;
-
-    }else{//if no other process are available we will run the INIT process
-        current = INIT;
-        current->p_state = RUNNING;
+        List_prepend(&p2_list, temp);
     }
-    printf("Now running process with ID %d\n", current->pid);
+
+    printf(" Now running process %d.\n", current->pid);
+    return 1; 
+*/
+    printf("Quantum expired!\n");
+    printf("Process with ID %d is no longer running\n", current->pid);
+
+    if(current->pid != 1){
+        if(current->priority == 0){
+            List_prepend(&p0_list, current);
+        }else if(current->priority == 1){
+            List_prepend(&p1_list, current);
+        }else if(current->priority == 2){
+            List_prepend(&p2_list, current);
+        }
+    }
+
+    if(List_count(&p0_list) != 0){
+        current = List_trim(&p0_list);
+    }else if(List_count(&p1_list)){
+        current = List_trim(&p1_list);
+    }else if(List_count(&p2_list)){
+        current = List_trim(&p2_list);
+    }
+    return 1;
 }
 
 //send a message to another
 //process - block until reply
-int Send(){
-    printf("The send function\n");
+int Send(int pid, char* msg){
+    if(strlen(msg) > 40){
+        return -1;
+    }
+
+    struct PCB* temp0 = List_first(&p0_list);
+    struct PCB* temp1 = List_first(&p1_list);
+    struct PCB* temp2 = List_first(&p2_list);
+
+    while(temp0 != NULL){
+        if(temp0->pid == pid){
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp0->msg = msg;
+            temp0->sender_id = pid;
+            List_prepend(&blockedQueue, current);
+            List_remove(&p0_list);
+            return 1; 
+        }
+        temp0  = List_next(&p0_list);
+    }
+    while(temp1 != NULL){
+        if(temp1->pid == pid){
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp1->msg = msg;
+            temp1->sender_id = pid;
+            List_prepend(&blockedQueue, current);
+            List_remove(&p1_list);
+            return 1; 
+        }
+        temp1  = List_next(&p1_list);   
+    }
+    while(temp2 != NULL){
+        if(temp2->pid == pid){
+            printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
+            current->p_state = BLOCKED;
+            temp2->msg = msg;
+            temp2->sender_id = pid;
+            List_prepend(&blockedQueue, current);
+            List_remove(&p2_list);
+            return 1; 
+        }
+        temp2  = List_next(&p2_list);
+    }
 }
 
 //receive a message - block until
 //one arrives
 int Receive(){
+    if(current->msg != NULL){
+        printf("Message recieved by process %d!!", current->sender_id);
+    }else{
+        current->p_state = BLOCKED;
+        List_prepend(&blockedQueue, current);
+        Exit();
+    }
     printf("The receive function\n");
 }
 
 //unblocks sender and delivers
 //reply
-int Reply(){
-    printf("The reply function\n");
+int Reply(int pid){
+    struct PCB* temp = List_first(&blockedQueue);
+
+    while(temp != NULL){
+        if(temp->pid == pid){
+            printf("Sending a reply to process with id %d\n", pid);
+            temp->p_state = WAITING;
+            temp->msg = NULL;
+            temp->sender_id = -1;
+            List_remove(&blockedQueue);
+
+            if(temp->priority == 0){
+                List_prepend(&p0_list, temp);
+            }else if(temp->priority == 1){
+                List_prepend(&p1_list, temp);
+            }else if(temp->priority == 2)
+                List_prepend(&p2_list, temp);
+            return 1; 
+        }
+        temp  = List_next(&p0_list);
+    }
+    printf("Process not found");
 }
 
 //Initialize the named
@@ -262,6 +364,24 @@ int Process_info(int pid){
     }
 }
 
+//DUMMY (for testing purposes only)
+void print(List* pList){
+    struct PCB *pcb;
+    if(pList == NULL){
+        printf("No items in the list.\n");
+    }else{
+        Node* temp = pList->head;
+        printf("<-");
+        for(int i = 0; i< List_count(pList);i++){
+            pcb = temp->item;
+            printf("%d-", pcb->pid);
+            temp = temp->next;
+        }
+        printf("> Queue length: %d", List_count(pList));
+    }
+    printf("\n");
+}
+
 //display all process queues and
 //their contents
 int Total_info(){
@@ -275,6 +395,6 @@ int Total_info(){
 
 
 struct PCB * curr(){
-    printf("The currently running process: Process %d", current->pid);
+    printf("The currently running process: Process %d\n", current->pid);
     return current;
 }

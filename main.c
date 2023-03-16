@@ -1,23 +1,27 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "os.h"
 #include "list.h"
 
-
-
 int main (){
-
     pcbs = * List_create();
     p0_list = * List_create();
     p1_list = * List_create();
     p2_list = * List_create();
     Create(0);// Creating the INIT process
-
+    struct PCB * current; //will point to the currently running process;
+    struct PCB *INIT;
+    INIT = List_first(&pcbs);//INIT will be the first added to this list
+    current  = INIT;
+    // INIT->p_state = RUNNING;
 
     printf("Welcome to the Rastko_Luukas Operating System. Please enter one character at a time.\n");
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
     int num = -1;
+    int pid = -1;
     char buff[50];
+    char msg[40];
 
     while(buffer != '!'){
 
@@ -52,13 +56,28 @@ int main (){
                     Quantum();
                     break; 
                 case 'S':
-                    Send();
-                    break;           
+                    while(pid < 0) {
+                        printf("Please enter pid of process you want to send message to: ");
+                        scanf("%s", buff);
+                        pid = atoi(buff);
+                    }
+                    printf("Please enter the message you want process with %d id to recieve: ", pid);
+                    scanf("%s", msg);
+                    
+                    printf("Length of string is: %ld\n", strlen(msg));
+
+                    Send(pid, msg);
+                    pid = -1;
+                    break;   
                 case 'R':
                     Receive();
                     break;            
                 case 'Y':
-                    Reply();
+                    printf("Please enter pid of process you want to send message to: ");
+                    scanf("%s", buff);
+                    pid = atoi(buff);
+                    Reply(pid);
+                    pid = -1;
                     break;            
                 case 'N':
                     New_semaphore();

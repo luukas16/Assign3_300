@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
+#include <string.h>
 #include <time.h>
 #include <pthread.h>
 #include "list.h"
@@ -9,8 +10,8 @@
 #define BUFFER_SIZE 256
 
 static char buffer;
-struct PCB * current; //will point to the currently running process;
-struct PCB *INIT;
+static struct PCB * current; //will point to the currently running process;
+static struct PCB *INIT;
 static int process = 0;
 
 //the three priority queues
@@ -19,6 +20,8 @@ static List p0_list;
 static List p1_list;
 static List p2_list;
 
+static List blockedQueue;
+
 //enum containing the possible states that a process can be in
 typedef enum {
     RUNNING, WAITING, BLOCKED
@@ -26,12 +29,12 @@ typedef enum {
 
 //Structure containing information about a specific process
 struct PCB {
-
     int pid; //unique process identification number
     int priority; //0 = high, 1 = medium, 2 = low
     State p_state; // 
 
     char * msg; //storage for string messages
+    int sender_id;
 };
 
 //structure containing information about a specific semaphore
@@ -72,7 +75,7 @@ int Quantum();
 
 //send a message to another
 //process - block until reply
-int Send();
+int Send(int pid, char* msg);
 
 //receive a message - block until
 //one arrives
@@ -80,7 +83,7 @@ int Receive();
 
 //unblocks sender and delivers
 //reply
-int Reply();
+int Reply(int pid);
 
 //Initialize the named
 //semaphore with the value
