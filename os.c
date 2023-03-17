@@ -435,6 +435,8 @@ int Total_info(){
     print(&p1_list);
     printf("Priority 2: ");
     print(&p2_list);
+    printf("Blocked queue: ");
+    print(&blockedQueue);
 }
 
 
