@@ -37,6 +37,7 @@ struct PCB {
 
     char * msg; //storage for string messages
     int sender_id;
+    bool reply_pending;
 };
 
 //structure containing information about a specific semaphore

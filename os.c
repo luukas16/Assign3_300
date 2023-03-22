@@ -17,6 +17,7 @@ int Create(int priority){
     new_pcb->priority = priority;
     new_pcb->pid = process;
     new_pcb->p_state = WAITING;
+    new_pcb->reply_pending = false;
 
 
     if(process == 1){
@@ -243,6 +244,7 @@ int Send(int pid, char* msg){
     struct PCB* temp0 = List_first(&p0_list);
     struct PCB* temp1 = List_first(&p1_list);
     struct PCB* temp2 = List_first(&p2_list);
+    struct PCB* temp3 = List_first(&blockedQueue);
 
     //searching for the desired process
     while(temp0 != NULL){
@@ -253,10 +255,12 @@ int Send(int pid, char* msg){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             //we block the sender
             current->p_state = BLOCKED;
+            current->reply_pending = true;
+            current->sender_id = temp0->pid;
 
             //we give the message to the receiver and the ID of the sender
             temp0->msg = msg;
-            temp0->sender_id = pid;
+            temp0->sender_id = current->pid;
 
             //we add the sender to a blocked queue and 
             List_prepend(&blockedQueue, current);
@@ -269,8 +273,11 @@ int Send(int pid, char* msg){
         if(temp1->pid == pid){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             current->p_state = BLOCKED;
+            current->reply_pending = true;
+            current->sender_id = temp1->pid;
+
             temp1->msg = msg;
-            temp1->sender_id = pid;
+            temp1->sender_id = current->pid;
             List_prepend(&blockedQueue, current);
             Quantum();
             return 1; 
@@ -281,27 +288,62 @@ int Send(int pid, char* msg){
         if(temp2->pid == pid){
             printf("Message sent to the process with id %d. Sender is now blocked and waiting for response\n", pid);
             current->p_state = BLOCKED;
+            current->reply_pending = true;
+            current->sender_id = temp2->pid;
+
             temp2->msg = msg;
-            temp2->sender_id = pid;
+            temp2->sender_id = current->pid;
             List_prepend(&blockedQueue, current);
             Quantum();
             return 1; 
         }
         temp2  = List_next(&p2_list);
     }
+        while(temp3 != NULL){
+        if(temp3->pid == pid){
+            printf("Message sent to the process with id %d. Process has been unblocked\n", pid);
+            if(temp3->reply_pending == true){
+                printf("Process is waiting on a reply. Sending is not possible!\n");
+                return 0;
+            }
+            current->p_state = BLOCKED;
+            current->sender_id = temp3->pid;
+
+
+            temp3->msg = msg;
+            temp3->sender_id = current->pid;
+            temp3->p_state = WAITING;
+
+            if(temp3->priority == 0){
+                List_prepend(&p0_list, temp3);
+            }else if(temp3->priority == 1){
+                List_prepend(&p1_list, temp3);
+            }else if(temp3->priority == 2){
+                List_prepend(&p2_list, temp3);
+            }   
+            List_remove(&blockedQueue); 
+            List_prepend(&blockedQueue, current);
+            Quantum();
+            return 1; 
+        }
+        temp3 = List_next(&blockedQueue);
+    }
 }
 
 //receive a message - block until
 //one arrives
 int Receive(){
+
     if(current->msg != NULL){
         printf("Message received by process %d ", current->sender_id);
         printf("Message received: %s\n", current->msg);
     }else{
+        printf("There is no message to be received. Blocking process!\n");
         current->p_state = BLOCKED;
         List_prepend(&blockedQueue, current);
         Exit();
     }
+
 }
 
 //unblocks sender and delivers
@@ -311,6 +353,12 @@ int Reply(int pid){
 
     while(temp != NULL){
         if(temp->pid == pid){
+            printf("The sender_id of the process you seek is: %d\n", temp->sender_id);
+            printf("The current sender_id is: %d\n", current->sender_id);
+            if(pid != current->sender_id){
+                printf("Cannot reply to process which did not send this process a message!!\n");
+                return 0;
+            }
             printf("Sending a reply to process with id %d\n", pid);
             temp->p_state = WAITING;
             temp->msg = NULL;
@@ -325,7 +373,7 @@ int Reply(int pid){
                 List_prepend(&p2_list, temp);
             return 1; 
         }
-        temp  = List_next(&p0_list);
+        temp  = List_next(&blockedQueue);
     }
     printf("Process not found");
 }

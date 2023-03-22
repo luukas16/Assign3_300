@@ -75,7 +75,7 @@ int main (){
                     Receive();
                     break;            
                 case 'Y':
-                    printf("Please enter pid of process you want to send message to: ");
+                    printf("Please enter pid of process you want to reply to: ");
                     scanf("%s", buff);
                     pid = atoi(buff);
                     Reply(pid);
