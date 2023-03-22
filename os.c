@@ -353,8 +353,6 @@ int Reply(int pid){
 
     while(temp != NULL){
         if(temp->pid == pid){
-            printf("The sender_id of the process you seek is: %d\n", temp->sender_id);
-            printf("The current sender_id is: %d\n", current->sender_id);
             if(pid != current->sender_id){
                 printf("Cannot reply to process which did not send this process a message!!\n");
                 return 0;
@@ -391,16 +389,19 @@ int New_semaphore(int sid){
         printf("Five semaphores already exist!\n");
         return 0;
     //if the user has already created this semaphore then we will do nothing
-    }else if(semaphoreList[sid] != NULL){
+    }else if(taken_semList[sid] == true ){
         printf("This semaphore has already been created!\n");
         return 0;
     }else{//if we make it here then there are less than 5 semaphores in existence and the user has provided a new value
 
         semaphore_count++;
+        taken_semList[sid] = true;
         struct semaphore *new_sem = malloc(sizeof(struct semaphore));
         new_sem->sid = sid;
+        new_sem->sem_value = 1;
         new_sem->blocked  = * List_create();
         printf("Semaphore created with ID: %d\n", new_sem->sid);
+        semaphoreList[sid] = new_sem;
     }
 }
 
@@ -409,17 +410,57 @@ int New_semaphore(int sid){
 //running process. You can
 //assume sempahores IDs
 //numbered 0 through 4.
-int P_semaphore(){
-    printf("The p_semaphore function\n");
+int P_semaphore(int sid){
+    if(current->pid == 1){
+        printf("The INIT process cannot use semaphore functionality\n");
+        return 0;
+    }
+    Semaphore* s = semaphoreList[sid];
+    s->sem_value--;
+    if(s->sem_value < 0){
+        if(s->owner == current->pid){
+            printf("This process already owns this semaphore ya goober!\n");
+            return 0;
+        }
+        // Block process on semaphore list
+        printf("Blocking process %d on semaphore number %d\n", current->pid, sid);
+
+        List_prepend(&s->blocked, current);
+        return 0;
+    }
+    s->owner = current->pid;
+    printf("Process %d owns semaphore number %d\n", current->pid, sid);
 }
 
 //execute the semaphore V
 //operation on behalf of the
 //running process. You can
-//assume sempahores IDs
+//assume sempaphores IDs
 //numbered 0 through 4.
-int V_semaphore(){
-    printf("The v_semaphore function\n");
+int V_semaphore(int sid){
+
+    if(current->pid == 1){
+        printf("The INIT process cannot use semaphore functionality\n");
+        return 0;
+    }
+    Semaphore* s = semaphoreList[sid];
+    if(s->sem_value == 1){
+        printf("No processes currently blocked on semaphore number %d\n", sid);
+        return 0;
+    }
+    if(s->owner == current->pid){
+        s->sem_value++;
+        if(s->sem_value <= 0){
+            // Unblock process from semaphore list
+            struct PCB * temp = List_trim(&s->blocked);
+            printf("Unblocking process %d from semaphore %d\n", temp->pid, sid);
+            s->owner = temp->pid;
+        }
+    }else{
+        printf("This process does not own the semaphore and cannot unblock\n");
+        return 0;
+    }
+    return 1;
 }
 
 //dump complete state

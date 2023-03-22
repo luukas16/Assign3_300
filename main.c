@@ -91,10 +91,22 @@ int main (){
                     sid = -1;
                     break;          
                 case 'P':
-                    P_semaphore();
+                    while(sid < 0 || sid > 4){
+                        printf("Please enter an ID of the semaphore you want to call P on: ");
+                        scanf("%s", buff);
+                        sid = atoi(buff);
+                    }
+                    P_semaphore(sid);
+                    sid = -1;
                     break;          
                 case 'V':
-                    V_semaphore();
+                    while(sid < 0 || sid > 4){
+                        printf("Please enter an ID of the semaphore you want to call V on: ");
+                        scanf("%s", buff);
+                        sid = atoi(buff);
+                    }
+                    V_semaphore(sid);
+                    sid = -1;
                     break;           
                 case 'I':
                     printf("Please enter the process ID of the process you wish information for: ");

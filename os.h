@@ -15,6 +15,7 @@ static struct PCB *INIT;
 static int process = 0;
 static int semaphore_count = 0;
 static struct semaphore *semaphoreList[5];
+static bool taken_semList[5] = {false,false,false,false,false};
 
 //the three priority queues
 static List pcbs;
@@ -42,13 +43,13 @@ struct PCB {
 
 //structure containing information about a specific semaphore
 typedef struct semaphore{
-
+    int owner;
     int sem_value; 
     int sid;  //unique identifier of the semaphore
 
     List blocked;
 
-};
+}Semaphore;
 
 
 //DUMMY (for testing purposes only)
