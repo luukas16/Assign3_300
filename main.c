@@ -20,6 +20,7 @@ int main (){
     printf("Enter 'H' for a list of useable commands and '!' to close the program\n");
     int num = -1;
     int pid = -1;
+    int sid = -1;
     char buff[50];
     char msg[40];
 
@@ -62,7 +63,8 @@ int main (){
                         pid = atoi(buff);
                     }
                     printf("Please enter the message you want process with %d id to recieve: ", pid);
-                    scanf("%s", msg);
+                    scanf (" %[^\n]%*c", msg);
+                    //scanf("%s", msg);
                     
                     printf("Length of string is: %ld\n", strlen(msg));
 
@@ -80,8 +82,14 @@ int main (){
                     pid = -1;
                     break;            
                 case 'N':
-                    New_semaphore();
-                    break;           
+                    while(sid < 0 || sid > 4){
+                        printf("Please enter an ID of the semaphore you want to create (values between 0 and 4): ");
+                        scanf("%s", buff);
+                        sid = atoi(buff);
+                    }
+                    New_semaphore(sid);
+                    sid = -1;
+                    break;          
                 case 'P':
                     P_semaphore();
                     break;          

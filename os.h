@@ -13,6 +13,8 @@ static char buffer;
 static struct PCB * current; //will point to the currently running process;
 static struct PCB *INIT;
 static int process = 0;
+static int semaphore_count = 0;
+static struct semaphore *semaphoreList[5];
 
 //the three priority queues
 static List pcbs;
@@ -40,7 +42,10 @@ struct PCB {
 //structure containing information about a specific semaphore
 typedef struct semaphore{
 
-    int sem_value; //unique identifier of the semaphore
+    int sem_value; 
+    int sid;  //unique identifier of the semaphore
+
+    List blocked;
 
 };
 
@@ -92,7 +97,7 @@ int Reply(int pid);
 //done once for a semaphore -
 //subsequent attempts result in
 //error.
-int New_semaphore();
+int New_semaphore(int sid);
 
 //execute the semaphore P
 //operation on behalf of the

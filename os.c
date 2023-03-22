@@ -231,6 +231,10 @@ int Quantum(){
 //process - block until reply
 int Send(int pid, char* msg){
 
+    if(current->pid == 1){
+        printf("Cannot send from the INIT process!!\n");
+        return 0;
+    }
     //if the message is too long we will not send it
     if(strlen(msg) > 40){
         return -1;
@@ -333,8 +337,23 @@ int Reply(int pid){
 //done once for a semaphore -
 //subsequent attempts result in
 //error.
-int New_semaphore(){
-    printf("The new_semaphore function\n");
+int New_semaphore(int sid){
+    //if we already have five semaphores we will not create another
+    if(semaphore_count >= 5){
+        printf("Five semaphores already exist!\n");
+        return 0;
+    //if the user has already created this semaphore then we will do nothing
+    }else if(semaphoreList[sid] != NULL){
+        printf("This semaphore has already been created!\n");
+        return 0;
+    }else{//if we make it here then there are less than 5 semaphores in existence and the user has provided a new value
+
+        semaphore_count++;
+        struct semaphore *new_sem = malloc(sizeof(struct semaphore));
+        new_sem->sid = sid;
+        new_sem->blocked  = * List_create();
+        printf("Semaphore created with ID: %d\n", new_sem->sid);
+    }
 }
 
 //execute the semaphore P
